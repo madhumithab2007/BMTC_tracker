@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | BMTC Bus Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-body">
+    <main class="login-shell">
+        <section class="login-card">
+            <div class="login-copy">
+                <p class="eyebrow">BMTC Tracker</p>
+                <h1>Sign in to manage bus updates and commuter feedback.</h1>
+                <p>Use the seeded demo accounts below after importing the database schema.</p>
+                <div class="demo-credentials">
+                    <p><strong>Admin:</strong> admin@bmtc.local / Admin@123</p>
+                    <p><strong>Rider:</strong> rider@bmtc.local / Rider@123</p>
+                </div>
+            </div>
+
+            <form id="loginForm" class="login-form">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="admin@bmtc.local" required>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+
+                <button type="submit">Log In</button>
+                <p id="loginMessage" class="form-message" aria-live="polite"></p>
+                <p class="auth-link">New here? <a href="signup.html">Create an account</a></p>
+            </form>
+        </section>
+    </main>
+
+    <script src="login.js"></script>
+</body>
+</html>

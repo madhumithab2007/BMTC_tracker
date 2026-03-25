@@ -1,31 +1,55 @@
 <?php
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
 
-// Include database connection
+declare(strict_types=1);
+
+require_once __DIR__ . '/../config/api_helpers.php';
 require_once __DIR__ . '/../config/db_connection.php';
 
-// Query to get all active buses with their locations
-$query = "SELECT b.bus_id, b.bus_number, b.status, b.capacity,
-          r.route_name, r.source, r.destination,
-          bl.latitude, bl.longitude, bl.speed, bl.last_updated
-          FROM buses b
-          LEFT JOIN routes r ON b.route_id = r.route_id
-          LEFT JOIN bus_locations bl ON b.bus_id = bl.bus_id
-          WHERE b.status = 'active'
-          ORDER BY b.bus_number";
+allow_preflight();
+
+$query = "
+    SELECT
+        b.bus_id,
+        b.bus_number,
+        b.status,
+        b.capacity,
+        b.driver_name,
+        r.route_name,
+        r.source,
+        r.destination,
+        r.distance_km,
+        r.estimated_duration_mins,
+        bl.latitude,
+        bl.longitude,
+        bl.speed,
+        bl.heading,
+        bl.last_updated
+    FROM buses b
+    LEFT JOIN routes r ON b.route_id = r.route_id
+    LEFT JOIN (
+        SELECT l1.*
+        FROM bus_locations l1
+        INNER JOIN (
+            SELECT bus_id, MAX(last_updated) AS latest_update
+            FROM bus_locations
+            GROUP BY bus_id
+        ) latest
+            ON latest.bus_id = l1.bus_id
+           AND latest.latest_update = l1.last_updated
+    ) bl ON b.bus_id = bl.bus_id
+    WHERE b.status = 'active'
+    ORDER BY b.bus_number ASC
+";
 
 $result = $conn->query($query);
-$buses = array();
+$buses = [];
 
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $buses[] = $row;
-    }
-    echo json_encode(['success' => true, 'buses' => $buses]);
-} else {
-    echo json_encode(['success' => true, 'buses' => [], 'message' => 'No buses found']);
+while ($row = $result->fetch_assoc()) {
+    $buses[] = $row;
 }
 
-$conn->close();
-?>
+send_json([
+    'success' => true,
+    'buses' => $buses,
+    'count' => count($buses),
+]);

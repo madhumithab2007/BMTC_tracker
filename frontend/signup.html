@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | BMTC Bus Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-body">
+    <main class="login-shell">
+        <section class="login-card">
+            <div class="login-copy">
+                <p class="eyebrow">BMTC Tracker</p>
+                <h1>Create your account before logging in.</h1>
+                <p>New commuters can register here and start using the live bus tracker immediately.</p>
+                <div class="demo-credentials">
+                    <p>Your account will be stored in the `users` table with the commuter role.</p>
+                    <p>After sign-up, you will be logged in automatically.</p>
+                </div>
+            </div>
+
+            <form id="signupForm" class="login-form">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" placeholder="Enter your full name" required>
+
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" placeholder="you@example.com" required>
+
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" placeholder="Minimum 8 characters" required>
+
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" placeholder="Re-enter your password" required>
+
+                <button type="submit">Create Account</button>
+                <p id="signupMessage" class="form-message" aria-live="polite"></p>
+                <p class="auth-link">Already have an account? <a href="login.html">Log in</a></p>
+            </form>
+        </section>
+    </main>
+
+    <script src="signup.js"></script>
+</body>
+</html>
