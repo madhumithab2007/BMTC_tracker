@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMTC Bus Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚍 BMTC Bus Tracker</h1>
+            <p>Real-time bus tracking for Bangalore</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="search-box">
+                    <input type="text" id="searchBus" placeholder="Search by bus number...">
+                    <button onclick="searchBus()">🔍 Search</button>
+                </div>
+                
+                <div class="bus-list">
+                    <h3>Active Buses</h3>
+                    <div id="busListContainer">
+                        <p>Loading buses...</p>
+                    </div>
+                </div>
+                
+                <div class="feedback-section">
+                    <h3>Share Your Experience</h3>
+                    <form id="feedbackForm">
+                        <input type="text" id="userName" placeholder="Your Name" required>
+                        <input type="text" id="busNumber" placeholder="Bus Number" required>
+                        <select id="rating" required>
+                            <option value="">Select Rating</option>
+                            <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                            <option value="4">⭐⭐⭐⭐ Good</option>
+                            <option value="3">⭐⭐⭐ Average</option>
+                            <option value="2">⭐⭐ Poor</option>
+                            <option value="1">⭐ Very Poor</option>
+                        </select>
+                        <textarea id="comment" placeholder="Your feedback..." rows="3"></textarea>
+                        <button type="submit">Submit Feedback</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
