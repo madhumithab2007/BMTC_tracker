@@ -1,5 +1,5 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const mysql = require('mysql2/promise');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -12,22 +12,32 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static('frontend'));
-
-// MongoDB Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://YOUR_USERNAME:YOUR_PASSWORD@cluster.mongodb.net/bmtc_tracker';
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log('✅ Connected to MongoDB Atlas'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
-
-// User Schema
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now }
+// MySQL Connection Pool
+const pool = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
+    ssl: {
+        rejectUnauthorized: true
+    },
+    waitForConnections: true,
+    queueLimit: 0
+     connectionLimit: 10,
 });
 
-const User = mongoose.model('User', userSchema);
+// Test database connection
+async function testConnection() {
+    try {
+        const connection = await pool.getConnection();
+        console.log('✅ Connected to MySQL database');
+        connection.release();
+    } catch (error) {
+        console.error('❌ MySQL connection error:', error);
+    }
+}
+testConnection();
 
 // Bus Schema
 const busSchema = new mongoose.Schema({
