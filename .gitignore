@@ -1,3 +1,4 @@
-.vscode/ 
-.env 
-*.log 
+node_modules/
+.env
+.vscode/
+*.log
