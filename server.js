@@ -12,6 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static('frontend'));
+
 // MySQL Connection Pool
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
@@ -23,8 +24,8 @@ const pool = mysql.createPool({
         rejectUnauthorized: true
     },
     waitForConnections: true,
+    connectionLimit: 10,
     queueLimit: 0
-     connectionLimit: 10,
 });
 
 // Test database connection
@@ -41,10 +42,10 @@ testConnection();
 
 // Bus Schema
 const busSchema = new mongoose.Schema({
-  number: { type: String, required: true },
-  route: { type: String, required: true },
-  stops: [String],
-  arrivalTime: String
+    number: { type: String, required: true },
+    route: { type: String, required: true },
+    stops: [String],
+    arrivalTime: String
 });
 
 const Bus = mongoose.model('Bus', busSchema);
@@ -111,31 +112,77 @@ app.post('/api/login', async (req, res) => {
 
 // Get buses by stop
 app.get('/api/buses', async (req, res) => {
-  try {
-    const stop = req.query.stop;
-    if (!stop) {
-      return res.json([]);
+    try {
+        const stop = req.query.stop;
+        if (!stop) {
+            return res.json([]);
+        }
+        
+        const [buses] = await pool.query(
+            'SELECT * FROM buses WHERE stops LIKE ?',
+            [`%${stop}%`]
+        );
+        res.json(buses);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
     }
-    
-    // Search buses that include this stop
-    const buses = await Bus.find({ 
-      stops: { $regex: stop, $options: 'i' } 
-    });
-    res.json(buses);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
 });
 
 // Get all buses
 app.get('/api/buses/all', async (req, res) => {
-  try {
-    const buses = await Bus.find();
-    res.json(buses);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    try {
+        const [buses] = await pool.query('SELECT * FROM buses');
+        res.json(buses);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
 });
+
+// Add a new bus
+app.post('/api/buses', async (req, res) => {
+    try {
+        const { number, route, stops, arrivalTime } = req.body;
+        const [result] = await pool.query(
+            'INSERT INTO buses (number, route, stops, arrivalTime) VALUES (?, ?, ?, ?)',
+            [number, route, JSON.stringify(stops), arrivalTime]
+        );
+        res.status(201).json({ id: result.insertId, message: 'Bus added successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Update a bus
+app.put('/api/buses/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { number, route, stops, arrivalTime } = req.body;
+        const [result] = await pool.query(
+            'UPDATE buses SET number = ?, route = ?, stops = ?, arrivalTime = ? WHERE id = ?',
+            [number, route, JSON.stringify(stops), arrivalTime, id]
+        );
+        res.json({ message: 'Bus updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete a bus
+app.delete('/api/buses/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const [result] = await pool.query('DELETE FROM buses WHERE id = ?', [id]);
+        res.json({ message: 'Bus deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 // Submit feedback
 app.post('/api/feedback', async (req, res) => {
